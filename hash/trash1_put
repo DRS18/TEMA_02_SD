@@ -1,0 +1,46 @@
+void put(struct Hashtable *ht, void *key, int key_size_bytes, void *value) {
+    int h = 0;
+    struct info *curr_info;
+    
+    curr_info = malloc(sizeof(struct info));
+    curr_info->key = malloc(key_size_bytes);
+    memcpy(curr_info->key, key, key_size_bytes);
+    curr_info->value = value;
+
+    h = ht->hash_function(key) % ht->hmax;
+    // printf("%d\n", h);
+
+    if (ht->buckets[h]->freq == 0) {
+        // printf("DAAA\n");
+        // memcpy(ht->buckets[h], curr_info, sizeof(struct info));
+        free(ht->buckets[h]); // AICI FREE
+        ht->buckets[h] = curr_info;
+        // printf("%p - %p\n", (void *)ht->buckets[h], (void *)curr_info);
+        // free(curr_info->key);
+        // free(curr_info);
+        ht->buckets[h]->freq++;
+        return;
+    } else {
+        while (ht->buckets[h]->freq != 0) {
+            if (strcmp(ht->buckets[h]->value, curr_info->value) == 0) {
+                ht->buckets[h]->freq++;
+                free(curr_info->key);
+                free(curr_info);
+                // printf("ACELASI CUV %p - %p\n", (void *)ht->buckets[h], (void *)curr_info);
+                return;
+            } else if (ht->buckets[h + 1]->freq == 0) {
+                free(ht->buckets[h+1]); // AICI FREE
+                ht->buckets[h + 1] = curr_info;
+                ht->buckets[h + 1]->freq++;
+                // printf("%p - %p\n", (void *)ht->buckets[h + 1], (void *)curr_info);
+                return;
+            }   
+
+            if (h < ht->hmax - 1) {
+                h++;
+            } else {
+                h = 0;
+            }
+        }
+    }
+}

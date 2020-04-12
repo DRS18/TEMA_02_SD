@@ -1,0 +1,35 @@
+void put(struct Hashtable *ht, void *key, int key_size_bytes, void *value) {
+    int h = 0;
+    struct info *curr_info, curr_info1;
+    
+    curr_info = malloc(sizeof(struct info));
+    curr_info->key = malloc(key_size_bytes);
+    memcpy(curr_info->key, key, key_size_bytes);
+    curr_info->value = value;
+
+    h = ht->hash_function(key) % ht->hmax;
+
+    if (ht->buckets[h] == NULL) {
+        printf("DAAA\n");
+        ht->buckets[h] = curr_info;
+        ht->buckets[h]->freq++;
+    } else {
+        while (ht->buckets[h] != NULL) {
+            if (strcmp(ht->buckets[h]->value, curr_info->value) == 0) {
+                ht->buckets[h]->freq++;
+                free(curr_info->key);
+                free(curr_info);
+                return;
+            } 
+
+            h++;
+            if (h = ht->hmax) {
+                h = 0;
+            }
+        }
+
+        ht->buckets[h] = curr_info;
+            ht->buckets[h]->freq++;
+    }
+
+}
